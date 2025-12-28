@@ -2,7 +2,7 @@
 <configuration>
     <!-- 변수 지정 -->
     <variable name="LOG_DIR" value="${HOME_DIR}/logs" />
-    <variable name="FILE_NAME" value="admin.log" />
+    <variable name="FILE_NAME" value="front.log" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
