@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+<body>
+
+  <nav class="mobile-nav">
+    <button class="btn-close" aria-label="메뉴 닫기">&times;</button>
+    <ul>
+      <li th:each="menu : ${menuList}">
+        <a th:href="${menu.menuUrl}" class="nav-link" th:text="${menu.menuName}"></a>
+      </li>
+    </ul>
+  </nav>
+  <header>
+    <a href="/main" class="logo-link">
+      <img th:src="${company.logoUrl}" alt="San Investment Logo" />
+    </a>
+  </header>
+  <main>
+    <section class="lower-section">
+      <div class="lower-header">
+        <div class="scroll-wrapper">
+          <button class="scroll-button left-arrow" aria-label="이전 메뉴">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <div class="content-area-5">
+            <nav class="desktop-nav">
+              <a th:each="menu : ${menuList}" class="nav-link" th:href="${menu.menuUrl}" th:text="${menu.menuName}"></a>
+            </nav>
+          </div>
+          <button class="scroll-button right-arrow" aria-label="다음 메뉴">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div class="sidebar-area-1">
+          <button class="hamburger-menu" aria-label="메뉴 열기">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+
+      <article class="page-content">
+        <div class="investment-image-area">
+          <img th:src="${company.mainImgUrl}" alt="Sample Investment Image" style="max-width: 100%; height: auto"/>
+        </div>
+        <div class="investment-editor-area" th:utext="${company.companyInfo}"></div>
+        <div class="investment-card-area">
+          <div class="investment-card">
+            <h3 class="card-title">Card Title 1</h3>
+            <img src="ui/1.png" alt="Card Image 1" />
+          </div>
+          <div class="investment-card">
+            <h3 class="card-title">Card Title 2</h3>
+            <img src="ui/2.png" alt="Card Image 2" />
+          </div>
+          <div class="investment-card">
+            <h3 class="card-title">Card Title 3</h3>
+            <img src="ui/1.png" alt="Card Image 3" />
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+  </main>
+</body>
+<th:block th:replace="~{fragments/scripts :: commonScripts}"></th:block>
+</html>

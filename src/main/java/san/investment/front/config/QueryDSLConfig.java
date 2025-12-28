@@ -1,0 +1,26 @@
+package san.investment.front.config;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * packageName : san.investment.front.config
+ * className : QueryDSLConfig
+ * user : jwlee
+ * date : 2025. 12. 28.
+ * description :
+ */
+@Configuration
+public class QueryDSLConfig {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(entityManager);
+    }
+}
