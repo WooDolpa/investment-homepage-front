@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
+</head>
+<body>
+    <th:block th:replace="~{fragments/common :: commonMobileNav}"></th:block>
+    <th:block th:replace="~{fragments/common :: commonLogo}"></th:block>
+    <main>
+        <section class="lower-section">
+            <th:block th:replace="~{fragments/common :: commonNav}"></th:block>
+            <article class="page-content portfolio-detail__content">
+                <section class="portfolio-detail__hero">
+                    <div class="portfolio-detail__hero-media">
+                        <img src="ui/1.png" alt="Growth Fund hero" />
+                    </div>
+                    <div class="portfolio-detail__hero-info">
+                        <h1 class="portfolio-detail__title">Growth Fund</h1>
+                        <div class="portfolio-detail__htmleditor-intro"></div>
+                    </div>
+                </section>
+                <section class="portfolio-detail__htmleditor">
+                    <div class="portfolio-detail__htmleditor-content" data-htmleditor-target></div>
+                </section>
+                <section class="portfolio-detail__performance">
+                    <div class="performance-search" role="search">
+                        <form class="performance-search__controls">
+                            <div>
+                                <select id="performance-filter" class="performance-search__select" aria-label="검색 조건 선택">
+                                    <option value="all" selected>전체</option>
+                                    <option value="period">기간</option>
+                                    <option value="fund">펀드명</option>
+                                    <option value="benchmark">벤치마크</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input
+                                        type="search"
+                                        id="performance-query"
+                                        name="performance-query"
+                                        class="performance-search__input"
+                                        placeholder="검색어를 입력하세요"
+                                        autocomplete="off"
+                                />
+                            </div>
+                            <button type="button" class="performance-search__button">검색</button>
+                        </form>
+                    </div>
+                    <div class="performance-table-area" aria-live="polite">
+                        <table class="portfolio-detail__table performance-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">제목</th>
+                                <th scope="col">언론사</th>
+                                <th scope="col">날짜</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <a href="#" class="performance-table__link">산 인베스트먼트, 2024년 지속가능 펀드 전략 발표</a>
+                                </td>
+                                <td>머니투데이</td>
+                                <td>2024-05-16</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="#" class="performance-table__link">AI·에너지 전환 투자로 1분기 두 자릿수 수익 달성</a>
+                                </td>
+                                <td>서울경제</td>
+                                <td>2024-04-02</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="#" class="performance-table__link">San Investment, ESG 기준 강화와 포트폴리오 리밸런싱</a>
+                                </td>
+                                <td>매일경제</td>
+                                <td>2024-03-18</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="#" class="performance-table__link">글로벌 테크·헬스케어 중심 장기 전략 확대 계획</a>
+                                </td>
+                                <td>한국경제</td>
+                                <td>2024-02-07</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </article>
+        </section>
+        <th:block th:replace="~{fragments/footer :: commonFooter}"></th:block>
+    </main>
+</body>
+<th:block th:replace="~{fragments/scripts :: commonScripts}"></th:block>
+</html>

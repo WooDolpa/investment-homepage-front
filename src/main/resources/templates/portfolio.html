@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
+</head>
+<body>
+    <th:block th:replace="~{fragments/common :: commonMobileNav}"></th:block>
+    <th:block th:replace="~{fragments/common :: commonLogo}"></th:block>
+    <main>
+        <section class="lower-section">
+            <th:block th:replace="~{fragments/common :: commonNav}"></th:block>
+            <article class="page-content">
+                <div class="portfolio-search" role="search">
+                    <div class="portfolio-search__field">
+                        <input
+                                type="search"
+                                id="portfolio-search-input"
+                                class="portfolio-search__input"
+                                placeholder="Search by fund name"
+                                aria-label="Search portfolio funds"
+                                autocomplete="off"
+                        />
+                        <button class="portfolio-search__button" aria-label="Search">
+                            <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="portfolio-empty" hidden>검색 결과가 없습니다.</div>
+                <div class="investment-card-area">
+                    <a th:each="portfolio : ${portfolioList}" class="investment-card" th:href="${portfolio.portfolioDetailUrl}" th:data-name="${portfolio.portfolioTitle}">
+                        <h3 class="card-title" th:text="${portfolio.portfolioTitle}"></h3>
+                        <img th:src="${portfolio.portfolioImgUrl}" alt="Growth Fund" />
+                    </a>
+                </div>
+            </article>
+        </section>
+        <th:block th:replace="~{fragments/footer :: commonFooter}"></th:block>
+    </main>
+</body>
+<th:block th:replace="~{fragments/scripts :: commonScripts}"></th:block>
+</html>
