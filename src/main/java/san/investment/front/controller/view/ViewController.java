@@ -80,9 +80,11 @@ public class ViewController {
 
         CompanyResDto company = companyService.findCompany();
         List<MenuResDto> menuList = menuService.findMenuList();
+        PortfolioResDto portfolio = portfolioService.findPortfolio(portfolioNo);
 
         model.addAttribute("company", company);
         model.addAttribute("menuList", menuList);
+        model.addAttribute("portfolio", portfolio);
 
         return "portfolio_detail";
     }

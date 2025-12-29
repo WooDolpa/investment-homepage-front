@@ -12,11 +12,13 @@
             <article class="page-content portfolio-detail__content">
                 <section class="portfolio-detail__hero">
                     <div class="portfolio-detail__hero-media">
-                        <img src="ui/1.png" alt="Growth Fund hero" />
+                        <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="Portfolio Image" />
                     </div>
                     <div class="portfolio-detail__hero-info">
-                        <h1 class="portfolio-detail__title">Growth Fund</h1>
-                        <div class="portfolio-detail__htmleditor-intro"></div>
+                        <h1 class="portfolio-detail__title" th:text="${portfolio.portfolioTitle}"></h1>
+                        <div class="portfolio-detail__htmleditor-intro">
+                            <p th:text="${portfolio.portfolioSummary}"></p>
+                        </div>
                     </div>
                 </section>
                 <section class="portfolio-detail__htmleditor">
