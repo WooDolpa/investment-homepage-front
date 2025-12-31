@@ -3,11 +3,14 @@ package san.investment.front.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import san.investment.common.entity.portfolio.Portfolio;
+import san.investment.common.entity.portfolio.PortfolioMain;
 import san.investment.common.enums.DataStatus;
 import san.investment.common.enums.PortfolioType;
 import san.investment.common.exception.CustomException;
 import san.investment.common.exception.ExceptionCode;
+import san.investment.front.dto.portfolio.PortfolioMainResDto;
 import san.investment.front.dto.portfolio.PortfolioResDto;
+import san.investment.front.repository.portfolio.PortfolioMainRepository;
 import san.investment.front.repository.portfolio.PortfolioRepository;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
+    private final PortfolioMainRepository portfolioMainRepository;
 
     /**
      * 포트폴리오 진행중 조회
@@ -26,7 +30,7 @@ public class PortfolioService {
      */
     public List<PortfolioResDto> findProgressPortfolioList() {
 
-        List<Portfolio> portfolioList = portfolioRepository.findByDataStatusAndPortfolioType(DataStatus.Yes, PortfolioType.PROGRESS)
+        List<Portfolio> portfolioList = portfolioRepository.findPortfolioList(DataStatus.Yes, PortfolioType.PROGRESS)
                 .orElse(new ArrayList<>());
 
         return portfolioList.stream()
@@ -49,7 +53,7 @@ public class PortfolioService {
      */
     public List<PortfolioResDto> findCompletedPortfolioList() {
 
-        List<Portfolio> portfolioList = portfolioRepository.findByDataStatusAndPortfolioType(DataStatus.Yes, PortfolioType.COMPLETE)
+        List<Portfolio> portfolioList = portfolioRepository.findPortfolioList(DataStatus.Yes, PortfolioType.COMPLETE)
                 .orElse(new ArrayList<>());
 
         return portfolioList.stream()
@@ -84,5 +88,31 @@ public class PortfolioService {
                 .portfolioImgUrl(findPortfolio.getPortfolioImgUrl())
                 .portfolioDetailUrl("/portfolio/" + findPortfolio.getPortfolioNo())
                 .build();
+    }
+
+    /**
+     * 메인페이지 포트폴리오 조회
+     *
+     * @return
+     */
+    public List<PortfolioMainResDto> findPortfolioMainList() {
+
+        List<PortfolioMain> list = portfolioMainRepository.findPortfolioMainList()
+                .orElse(new ArrayList<>());
+
+        return list.stream().map(pm -> {
+
+            Portfolio portfolio = pm.getPortfolio();
+
+            return PortfolioMainResDto.builder()
+                    .portfolioMainNo(pm.getPortfolioMainNo())
+                    .portfolioNo(portfolio.getPortfolioNo())
+                    .portfolioTitle(portfolio.getPortfolioTitle())
+                    .portfolioSummary(portfolio.getPortfolioSummary())
+                    .portfolioContents(portfolio.getPortfolioContents())
+                    .portfolioImgUrl(portfolio.getPortfolioImgUrl())
+                    .portfolioDetailUrl("/portfolio/" + portfolio.getPortfolioNo())
+                    .build();
+        }).toList();
     }
 }
