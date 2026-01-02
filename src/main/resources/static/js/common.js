@@ -175,14 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
         card.classList.remove("is-reveal-init");
       });
     }
-
-    if (currentPage === "investment") {
-      investmentCards.forEach((card) => {
-        card.addEventListener("click", () => {
-          window.location.href = "portfolio.html";
-        });
-      });
-    }
   }
 
   // --- Reveal footer on scroll --- //

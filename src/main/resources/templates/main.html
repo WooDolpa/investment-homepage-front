@@ -15,7 +15,8 @@
                 </div>
                 <div class="investment-editor-area" th:utext="${company.companyInfo}"></div>
                     <div class="investment-card-area">
-                        <div class="investment-card" th:each="pm : ${portfolioMainList}">
+                        <div class="investment-card" th:each="pm : ${portfolioMainList}"
+                             th:data-url="${pm.portfolioDetailUrl}" onclick="window.location.href=this.dataset.url">
                             <h3 class="card-title" th:text="${pm.portfolioTitle}"></h3>
                             <img th:src="${pm.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
                         </div>
