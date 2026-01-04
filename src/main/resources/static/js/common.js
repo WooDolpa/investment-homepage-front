@@ -206,49 +206,132 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Portfolio Search Filtering --- //
-  if (currentPage === "portfolio") {
+  // --- Portfolio Search with API --- //
+  if (currentPage === "portfolio" || currentPage === "portfolio-history") {
     const searchInput = document.getElementById("portfolio-search-input");
-    const cards = Array.from(
-      document.querySelectorAll(".investment-card[data-name]")
-    );
+    const cardArea = document.querySelector(".investment-card-area");
     const emptyState = document.querySelector(".portfolio-empty");
 
-    const normalize = (value) =>
-      value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim();
+    // portfolioType 결정: portfolio 페이지는 "P", portfolio-history 페이지는 "C"
+    const portfolioType = currentPage === "portfolio" ? "P" : "C";
 
-    const filterCards = () => {
-      const keyword = normalize(searchInput.value);
-      let visibleCount = 0;
+    const createCardElement = (portfolio, index) => {
+      const card = document.createElement("a");
+      card.className = "investment-card is-reveal-init";
+      card.href = portfolio.portfolioDetailUrl || "#";
+      card.dataset.name = portfolio.portfolioTitle || "";
+      card.style.setProperty("--reveal-delay", `${index * 0.12}s`);
 
-      cards.forEach((card, index) => {
-        const name = normalize(card.dataset.name || card.textContent || "");
-        const isMatch = !keyword || name.includes(keyword);
+      const dateDiv = document.createElement("div");
+      dateDiv.className = "card-date";
+      dateDiv.textContent = portfolio.portfolioDate || "";
 
-        card.style.display = isMatch ? "" : "none";
-        card.classList.remove("is-visible", "is-reveal-init");
+      const title = document.createElement("h3");
+      title.className = "card-title";
+      title.textContent = portfolio.portfolioTitle || "";
 
-        if (isMatch) {
-          card.style.setProperty("--reveal-delay", `${visibleCount * 0.12}s`);
-          requestAnimationFrame(() => {
-            card.classList.add("is-visible");
-          });
-          visibleCount += 1;
+      const img = document.createElement("img");
+      img.src = portfolio.portfolioImgUrl || "/images/default-portfolio.svg";
+      img.alt = "";
+
+      card.appendChild(dateDiv);
+      card.appendChild(title);
+      card.appendChild(img);
+
+      return card;
+    };
+
+    const renderCards = (portfolios) => {
+      if (!cardArea) return;
+
+      // 기존 카드 모두 제거
+      cardArea.innerHTML = "";
+
+      if (!portfolios || portfolios.length === 0) {
+        if (emptyState) {
+          emptyState.hidden = false;
         }
-      });
+        return;
+      }
 
       if (emptyState) {
-        emptyState.hidden = visibleCount !== 0;
+        emptyState.hidden = true;
+      }
+
+      // 새 카드 생성 및 추가
+      portfolios.forEach((portfolio, index) => {
+        const card = createCardElement(portfolio, index);
+        cardArea.appendChild(card);
+
+        // 애니메이션 효과 적용
+        requestAnimationFrame(() => {
+          card.classList.add("is-visible");
+          card.classList.remove("is-reveal-init");
+        });
+      });
+    };
+
+    const searchPortfolios = async (keyword) => {
+      try {
+        const params = new URLSearchParams({
+          portfolioType: portfolioType,
+          searchType: "portfolioTitle",
+          keyword: keyword || "",
+        });
+
+        const response = await fetch(`/v1/api/portfolio/list?${params}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // API 응답이 배열인지 확인하고, 배열이 아니면 적절히 추출
+        let portfolios = data;
+        if (!Array.isArray(data)) {
+          // 응답이 객체인 경우 (예: {data: [...], total: 10})
+          portfolios = data.data || data.list || data.portfolios || [];
+        }
+
+        renderCards(portfolios);
+      } catch (error) {
+        console.error("Portfolio search error:", error);
+        if (emptyState) {
+          emptyState.hidden = false;
+        }
       }
     };
 
+    const searchButton = document.querySelector(".portfolio-search__button");
+
+    const handleSearch = () => {
+      if (searchInput) {
+        searchPortfolios(searchInput.value.trim());
+      }
+    };
+
+    // 엔터키 이벤트
     if (searchInput) {
-      searchInput.addEventListener("input", filterCards);
-      filterCards();
+      searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleSearch();
+        }
+      });
+    }
+
+    // 검색 버튼 클릭 이벤트
+    if (searchButton) {
+      searchButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleSearch();
+      });
     }
   }
 

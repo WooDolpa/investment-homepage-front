@@ -3,7 +3,7 @@
 <head>
     <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
 </head>
-<body>
+<body data-page="portfolio-history">
     <th:block th:replace="~{fragments/common :: commonMobileNav}"></th:block>
     <th:block th:replace="~{fragments/common :: commonLogo}"></th:block>
     <main>
@@ -16,8 +16,8 @@
                                 type="search"
                                 id="portfolio-search-input"
                                 class="portfolio-search__input"
-                                placeholder="Search by fund name"
-                                aria-label="Search portfolio funds"
+                                placeholder="포트폴리오 제목을 입력해주세요."
+                                aria-label="포트폴리오 제목을 입력해주세요."
                                 autocomplete="off"
                         />
                         <button class="portfolio-search__button" aria-label="Search">
@@ -41,6 +41,7 @@
                 <div class="portfolio-empty" hidden>검색 결과가 없습니다.</div>
                 <div class="investment-card-area">
                     <a th:each="portfolio : ${portfolioList}" class="investment-card" th:href="${portfolio.portfolioDetailUrl}" th:data-name="${portfolio.portfolioTitle}">
+                        <div class="card-date" th:text="${portfolio.portfolioDate}"></div>
                         <h3 class="card-title" th:text="${portfolio.portfolioTitle}"></h3>
                         <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
                     </a>

@@ -9,6 +9,7 @@ import lombok.*;
 public class PortfolioResDto {
 
     private Integer portfolioNo;
+    private String portfolioDate;
     private String portfolioTitle;
     private String portfolioSummary;
     private String portfolioImgUrl;

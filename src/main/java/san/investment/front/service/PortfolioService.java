@@ -10,6 +10,7 @@ import san.investment.common.exception.CustomException;
 import san.investment.common.exception.ExceptionCode;
 import san.investment.front.dto.portfolio.PortfolioMainResDto;
 import san.investment.front.dto.portfolio.PortfolioResDto;
+import san.investment.front.enums.SearchType;
 import san.investment.front.repository.portfolio.PortfolioMainRepository;
 import san.investment.front.repository.portfolio.PortfolioRepository;
 
@@ -37,6 +38,7 @@ public class PortfolioService {
                 .map(portfolio -> {
                     return PortfolioResDto.builder()
                             .portfolioNo(portfolio.getPortfolioNo())
+                            .portfolioDate(portfolio.getPortfolioDate())
                             .portfolioTitle(portfolio.getPortfolioTitle())
                             .portfolioSummary(portfolio.getPortfolioSummary())
                             .portfolioContents(portfolio.getPortfolioContents())
@@ -60,6 +62,7 @@ public class PortfolioService {
                 .map(portfolio -> {
                     return PortfolioResDto.builder()
                             .portfolioNo(portfolio.getPortfolioNo())
+                            .portfolioDate(portfolio.getPortfolioDate())
                             .portfolioTitle(portfolio.getPortfolioTitle())
                             .portfolioSummary(portfolio.getPortfolioSummary())
                             .portfolioContents(portfolio.getPortfolioContents())
@@ -82,6 +85,7 @@ public class PortfolioService {
 
         return PortfolioResDto.builder()
                 .portfolioNo(findPortfolio.getPortfolioNo())
+                .portfolioDate(findPortfolio.getPortfolioDate())
                 .portfolioTitle(findPortfolio.getPortfolioTitle())
                 .portfolioSummary(findPortfolio.getPortfolioSummary())
                 .portfolioContents(findPortfolio.getPortfolioContents())
@@ -107,6 +111,7 @@ public class PortfolioService {
             return PortfolioMainResDto.builder()
                     .portfolioMainNo(pm.getPortfolioMainNo())
                     .portfolioNo(portfolio.getPortfolioNo())
+                    .portfolioDate(portfolio.getPortfolioDate())
                     .portfolioTitle(portfolio.getPortfolioTitle())
                     .portfolioSummary(portfolio.getPortfolioSummary())
                     .portfolioContents(portfolio.getPortfolioContents())
@@ -114,5 +119,35 @@ public class PortfolioService {
                     .portfolioDetailUrl("/portfolio/" + portfolio.getPortfolioNo())
                     .build();
         }).toList();
+    }
+
+    /**
+     * 포트폴리오 조회
+     *
+     * @param portfolioTypeStr
+     * @param searchTypeStr
+     * @param keyword
+     * @return
+     */
+    public List<PortfolioResDto> findPortfolioList(String portfolioTypeStr, String searchTypeStr, String keyword) {
+
+        PortfolioType portfolioType = PortfolioType.findPortfolioType(portfolioTypeStr);
+        SearchType searchType = SearchType.findSearchType(searchTypeStr);
+
+        List<Portfolio> portfolioList = portfolioRepository.findPortfolioList(searchType, keyword, DataStatus.Yes, portfolioType)
+                .orElse(new ArrayList<>());
+
+        return portfolioList.stream()
+                .map(portfolio -> {
+                    return PortfolioResDto.builder()
+                            .portfolioNo(portfolio.getPortfolioNo())
+                            .portfolioDate(portfolio.getPortfolioDate())
+                            .portfolioTitle(portfolio.getPortfolioTitle())
+                            .portfolioSummary(portfolio.getPortfolioSummary())
+                            .portfolioContents(portfolio.getPortfolioContents())
+                            .portfolioImgUrl(portfolio.getPortfolioImgUrl())
+                            .portfolioDetailUrl("/portfolio/" + portfolio.getPortfolioNo())
+                            .build();
+                }).toList();
     }
 }
