@@ -56,10 +56,11 @@ This application depends on a shared common module:
 
 The application follows a clean layered MVC architecture:
 
-**Controller Layer** (`controller/view/`)
-- View controllers that return Thymeleaf template names
-- Not a REST API - server-side rendering approach
+**Controller Layer** (`controller/`)
+- **View Controllers** (`controller/view/`): Return Thymeleaf template names for server-side rendering
+- **API Controllers** (`controller/api/`): RESTful endpoints under `/v1/api` for AJAX requests
 - Controllers populate Model objects with DTOs for template rendering
+- Use `@Controller` for view controllers, `@RestController` for API endpoints
 
 **Service Layer** (`service/`)
 - Business logic and data transformation
@@ -101,8 +102,66 @@ The application follows a clean layered MVC architecture:
   - `header.html`: HTML head section
   - `footer.html`: Footer content
   - `scripts.html`: Common JavaScript includes
-- Page templates: `main.html`, `portfolio.html`
+- Page templates: `main.html`, `portfolio.html`, `portfolio_history.html`, `portfolio_detail.html`
 - Fragments are composed using `th:replace`
+
+**Page Identification Pattern**:
+- Each page template uses `data-page` attribute on `<body>` tag
+- JavaScript uses `document.body.dataset.page` to identify current page
+- Examples: `data-page="portfolio"`, `data-page="portfolio-history"`, `data-page="portfolio-detail"`
+
+### Frontend JavaScript Architecture
+
+**Common JavaScript** (`src/main/resources/static/js/common.js`):
+- Single JavaScript file for all page interactions
+- Uses page identification pattern to conditionally execute page-specific code
+- Pattern: `if (currentPage === "portfolio") { ... }`
+
+**Key Frontend Features**:
+1. **Portfolio Search** (portfolio.html, portfolio_history.html)
+   - Client-side search with API integration
+   - Triggered by Enter key or search button click
+   - Dynamic card rendering via `createCardElement()` and `renderCards()`
+   - API endpoint: `/v1/api/portfolio/list?portfolioType={P|C}&searchType=portfolioTitle&keyword={keyword}`
+
+2. **Card Animation System**
+   - Uses IntersectionObserver for scroll-based reveal animations
+   - Cards have `is-reveal-init` class initially, `is-visible` class when in viewport
+   - Staggered animation delays via `--reveal-delay` CSS custom property
+
+3. **Navigation**
+   - Mobile hamburger menu toggle
+   - Desktop horizontal scrollable navigation with drag support
+   - Active state management based on `data-page` attribute
+
+**CSS Architecture** (`src/main/resources/static/css/common.css`):
+- Single stylesheet for all pages
+- Card styling classes:
+  - `.card-date`: Small date text above title (portfolio pages)
+  - `.card-title`: Main title text (portfolio pages)
+  - `.card-title-date`: Date-only display (main page)
+  - All use absolute positioning over card images
+  - Hover effects change text color to `#6a0dad` (purple)
+
+### Portfolio Card Rendering Pattern
+
+**Unified Card Structure** (used in main.html, portfolio.html, portfolio_history.html):
+```html
+<a class="investment-card" th:href="${portfolio.portfolioDetailUrl}" th:data-name="${portfolio.portfolioTitle}">
+    <div class="card-date" th:text="${portfolio.portfolioDate}"></div>  <!-- Only on portfolio pages -->
+    <h3 class="card-title" th:text="${portfolio.portfolioTitle}"></h3>
+    <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
+</a>
+```
+
+**Main Page Variation**:
+- Uses `.card-title-date` class instead of separate date/title elements
+- Displays only date information in the title position
+
+**Dynamic Rendering** (via JavaScript):
+- `createCardElement(portfolio, index)`: Creates card DOM elements from API data
+- `renderCards(portfolios)`: Clears and re-renders entire card area
+- Preserves animation effects during re-render
 
 ### File Upload Handling
 
@@ -140,6 +199,17 @@ public class CustomRepositoryImpl {
 }
 ```
 
+## API Endpoints
+
+### Portfolio Search API
+- **Endpoint**: `GET /v1/api/portfolio/list`
+- **Parameters**:
+  - `portfolioType`: "P" (progress) or "C" (completed)
+  - `searchType`: "portfolioTitle" (currently only title search supported)
+  - `keyword`: Search keyword (can be empty for all results)
+- **Response**: JSON array of portfolio objects wrapped in `ApiResponseDto`
+- **Response Structure**: Can be either array `[...]` or object with nested array `{data: [...]}` or `{list: [...]}`
+
 ## Code Patterns and Conventions
 
 ### Service Layer Pattern
@@ -156,10 +226,17 @@ public class CustomRepositoryImpl {
 - Controllers inject multiple services as needed
 - Populate `Model` with DTOs using descriptive attribute names
 - Return template names as strings (e.g., `"main"`, `"portfolio"`)
+- API controllers return `ResponseEntity` with `ApiResponseDto` wrapper
 
 ### Constants Usage
 - API constants defined in `ApiConstants.java`
 - Use constants for fixed IDs (e.g., `ApiConstants.COMPANY_ID`)
+
+### Frontend JavaScript Patterns
+- Always check `currentPage` before executing page-specific code
+- Use `fetch` API for AJAX requests to `/v1/api` endpoints
+- Handle both array and object-wrapped API responses
+- Maintain animation classes during dynamic rendering
 
 ## Domain Structure
 
@@ -180,14 +257,15 @@ The application is organized by business domains:
 **Portfolio Domain**: Project portfolio display
 - Repository: `PortfolioRepository`
 - Service: `PortfolioService`
-- DTO: `PortfolioResDto`
-- Usage: Portfolio page with progress/completed projects
+- DTOs: `PortfolioResDto`, `PortfolioMainResDto`
+- Usage: Portfolio pages with progress/completed projects, search functionality
 
 ## Important Notes
 
-- This is a **view-rendering application**, not a REST API
+- This is a **hybrid application**: server-side rendering for initial page load, with AJAX API calls for dynamic content
 - All entities come from the shared `investment-homepage-common` module
 - Before running, ensure the common module is installed: `cd ../investment-homepage-common && ./gradlew clean build publishToMavenLocal`
 - Logs are written to `logs/admin.log` (configured in `logback-spring.xml`)
 - The application uses constructor-based dependency injection via Lombok
 - Static resources (CSS, JS) are in `src/main/resources/static/`
+- Portfolio images use fallback: `/images/default-portfolio.svg` when `portfolioImgUrl` is null
