@@ -3,7 +3,7 @@
 <head>
     <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
 </head>
-<body>
+<body data-page="portfolio-detail" th:data-portfolio-no="${portfolio.portfolioNo}">
     <th:block th:replace="~{fragments/common :: commonMobileNav}"></th:block>
     <th:block th:replace="~{fragments/common :: commonLogo}"></th:block>
     <main>
@@ -25,15 +25,14 @@
                 <section class="portfolio-detail__htmleditor">
                     <div class="portfolio-detail__htmleditor-content" data-htmleditor-target th:utext="${portfolio.portfolioContents}"></div>
                 </section>
-                <section class="portfolio-detail__performance" style="display: none;">
+                <section class="portfolio-detail__performance">
                     <div class="performance-search" role="search">
                         <form class="performance-search__controls">
                             <div>
                                 <select id="performance-filter" class="performance-search__select" aria-label="검색 조건 선택">
-                                    <option value="all" selected>전체</option>
-                                    <option value="period">기간</option>
-                                    <option value="fund">펀드명</option>
-                                    <option value="benchmark">벤치마크</option>
+                                    <option value="" selected>전체</option>
+                                    <option value="newsTitle">제목</option>
+                                    <option value="newsAgency">언론사</option>
                                 </select>
                             </div>
                             <div>
@@ -59,33 +58,12 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
+                            <tr th:each="portfolioNews : ${portfolioNewsList}">
                                 <td>
-                                    <a href="#" class="performance-table__link">산 인베스트먼트, 2024년 지속가능 펀드 전략 발표</a>
+                                    <a th:href="${portfolioNews.newsLink}" target="_blank" class="performance-table__link" th:text="${portfolioNews.newsTitle}"></a>
                                 </td>
-                                <td>머니투데이</td>
-                                <td>2024-05-16</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a href="#" class="performance-table__link">AI·에너지 전환 투자로 1분기 두 자릿수 수익 달성</a>
-                                </td>
-                                <td>서울경제</td>
-                                <td>2024-04-02</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a href="#" class="performance-table__link">San Investment, ESG 기준 강화와 포트폴리오 리밸런싱</a>
-                                </td>
-                                <td>매일경제</td>
-                                <td>2024-03-18</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a href="#" class="performance-table__link">글로벌 테크·헬스케어 중심 장기 전략 확대 계획</a>
-                                </td>
-                                <td>한국경제</td>
-                                <td>2024-02-07</td>
+                                <td th:text="${portfolioNews.newsAgency}"></td>
+                                <td th:text="${portfolioNews.regDatetime}"></td>
                             </tr>
                             </tbody>
                         </table>

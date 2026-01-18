@@ -432,5 +432,91 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // --- Portfolio News Search --- //
+    const portfolioNo = document.body.dataset.portfolioNo;
+    const newsSearchFilter = document.getElementById("performance-filter");
+    const newsSearchInput = document.getElementById("performance-query");
+    const newsSearchButton = document.querySelector(".performance-search__button");
+    const newsTableBody = document.querySelector(".performance-table tbody");
+
+    const searchPortfolioNews = async (searchType, keyword) => {
+      try {
+        const params = new URLSearchParams({
+          portfolioNo: portfolioNo,
+          searchType: searchType || "",
+          keyword: keyword || "",
+        });
+
+        const response = await fetch(`/v1/api/portfolio/news/list?${params}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        let newsList = data;
+        if (!Array.isArray(data)) {
+          newsList = data.data || data.list || [];
+        }
+
+        renderNewsTable(newsList);
+      } catch (error) {
+        console.error("Portfolio news search error:", error);
+      }
+    };
+
+    const renderNewsTable = (newsList) => {
+      if (!newsTableBody) return;
+
+      newsTableBody.innerHTML = "";
+
+      if (newsList.length === 0) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `<td colspan="3" style="text-align: center;">검색 결과가 없습니다.</td>`;
+        newsTableBody.appendChild(emptyRow);
+        return;
+      }
+
+      newsList.forEach((news) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>
+            <a href="${news.newsLink || "#"}" class="performance-table__link" target="_blank">${news.newsTitle || ""}</a>
+          </td>
+          <td>${news.newsAgency || ""}</td>
+          <td>${news.regDatetime || ""}</td>
+        `;
+        newsTableBody.appendChild(row);
+      });
+    };
+
+    const handleNewsSearch = () => {
+      const searchType = newsSearchFilter ? newsSearchFilter.value : "";
+      const keyword = newsSearchInput ? newsSearchInput.value.trim() : "";
+      searchPortfolioNews(searchType, keyword);
+    };
+
+    if (newsSearchInput) {
+      newsSearchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleNewsSearch();
+        }
+      });
+    }
+
+    if (newsSearchButton) {
+      newsSearchButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleNewsSearch();
+      });
+    }
   }
 });

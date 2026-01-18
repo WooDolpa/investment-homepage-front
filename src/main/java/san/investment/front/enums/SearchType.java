@@ -16,7 +16,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum SearchType {
 
-    PORTFOLIO_TITLE("portfolioTitle", "포트폴리오 제목")
+    PORTFOLIO_TITLE("portfolioTitle", "포트폴리오 제목"),
+    NEWS_TITLE("newsTitle", "뉴스 제목"),
+    NEWS_AGENCY("newsAgency", "언론사")
     ;
 
     private final String key;

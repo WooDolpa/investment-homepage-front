@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import san.investment.front.dto.company.CompanyResDto;
 import san.investment.front.dto.menu.MenuResDto;
 import san.investment.front.dto.portfolio.PortfolioMainResDto;
+import san.investment.front.dto.portfolio.PortfolioNewsResDto;
 import san.investment.front.dto.portfolio.PortfolioResDto;
 import san.investment.front.service.CompanyService;
 import san.investment.front.service.MenuService;
@@ -84,10 +85,12 @@ public class ViewController {
         CompanyResDto company = companyService.findCompany();
         List<MenuResDto> menuList = menuService.findMenuList();
         PortfolioResDto portfolio = portfolioService.findPortfolio(portfolioNo);
+        List<PortfolioNewsResDto> portfolioNewsList = portfolioService.findPortfolioNewsList(portfolioNo, null, null);
 
         model.addAttribute("company", company);
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolio", portfolio);
+        model.addAttribute("portfolioNewsList", portfolioNewsList);
 
         return "portfolio_detail";
     }
