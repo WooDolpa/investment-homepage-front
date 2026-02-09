@@ -4,17 +4,14 @@
     <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
 </head>
 <body>
+    <th:block th:replace="~{fragments/common :: commonMobileNav}"></th:block>
+    <th:block th:replace="~{fragments/common :: commonLogo}"></th:block>
     <main>
-        <section class="business-card">
-            <div class="business-card__logo" th:if="${company.logoUrl}">
-                <img th:src="${company.logoUrl}" th:alt="${company.companyName}" />
-            </div>
-            <h1 class="business-card__name" th:text="${company.companyName}"></h1>
-            <div class="business-card__image" th:if="${company.mainImgUrl}">
-                <img th:src="${company.mainImgUrl}" th:alt="${company.companyName}" />
-            </div>
-            <div class="business-card__address" th:if="${company.fullAddress}" th:text="${company.fullAddress}"></div>
+        <section class="lower-section">
+            <th:block th:replace="~{fragments/common :: commonNav}"></th:block>
         </section>
     </main>
+    <th:block th:replace="~{fragments/footer :: commonFooter}"></th:block>
 </body>
+<th:block th:replace="~{fragments/scripts :: commonScripts}"></th:block>
 </html>
