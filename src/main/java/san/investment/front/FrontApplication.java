@@ -3,9 +3,11 @@ package san.investment.front;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 @EntityScan(basePackages = {
         "san.investment.common.entity"
 })

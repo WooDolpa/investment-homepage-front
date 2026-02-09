@@ -12,7 +12,7 @@
             <article class="page-content portfolio-detail__content">
                 <section class="portfolio-detail__hero">
                     <div class="portfolio-detail__hero-media">
-                        <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="Portfolio Image" />
+                        <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" th:alt="${portfolio.portfolioTitle}" />
                     </div>
                     <div class="portfolio-detail__hero-info">
                         <div class="portfolio-detail__date" th:text="${portfolio.portfolioDate}"></div>

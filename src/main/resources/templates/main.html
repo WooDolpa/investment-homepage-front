@@ -11,7 +11,7 @@
             <th:block th:replace="~{fragments/common :: commonNav}"></th:block>
             <article class="page-content">
                 <div class="investment-image-area">
-                    <img th:src="${company.mainImgUrl}" alt="Sample Investment Image" style="max-width: 100%; height: auto"/>
+                    <img th:src="${company.mainImgUrl}" th:alt="${company.companyName} ?: 'San Investment'" style="max-width: 100%; height: auto"/>
                 </div>
                 <div class="investment-editor-area" th:utext="${company.companyInfo}"></div>
                     <div class="investment-card-area">
@@ -20,7 +20,7 @@
                            th:href="${pm.portfolioDetailUrl}"
                            th:data-name="${pm.portfolioTitle}">
                             <h3 class="card-title-date" th:text="${pm.portfolioDate}"></h3>
-                            <img th:src="${pm.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
+                            <img th:src="${pm.portfolioImgUrl ?: '/images/default-portfolio.svg'}" th:alt="${pm.portfolioTitle}" />
                         </a>
                     </div>
             </article>

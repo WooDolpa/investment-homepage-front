@@ -41,3 +41,8 @@ file:
 
 server:
   port: 8090
+
+app:
+  base-url: http://saninvestment.kr
+  site-name: San Investment
+  site-description: San Investment - 투자 전문 기업

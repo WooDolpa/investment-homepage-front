@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import san.investment.front.config.SeoConfig;
 import san.investment.front.dto.company.CompanyResDto;
 import san.investment.front.dto.menu.MenuResDto;
 import san.investment.front.dto.portfolio.PortfolioMainResDto;
@@ -30,6 +31,7 @@ public class ViewController {
     private final CompanyService companyService;
     private final MenuService menuService;
     private final PortfolioService portfolioService;
+    private final SeoConfig seoConfig;
 
     /**
      * 메인 페이지
@@ -48,6 +50,11 @@ public class ViewController {
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolioMainList", portfolioMainList);
 
+        // SEO
+        model.addAttribute("pageTitle", seoConfig.getSiteName() + " - " + seoConfig.getSiteDescription());
+        model.addAttribute("pageDescription", seoConfig.getSiteDescription());
+        model.addAttribute("canonicalUrl", seoConfig.getBaseUrl() + "/main");
+
         return "main";
     }
 
@@ -62,6 +69,11 @@ public class ViewController {
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolioList", portfolioList);
 
+        // SEO
+        model.addAttribute("pageTitle", "진행중인 포트폴리오 | " + seoConfig.getSiteName());
+        model.addAttribute("pageDescription", "San Investment 진행중인 포트폴리오 목록");
+        model.addAttribute("canonicalUrl", seoConfig.getBaseUrl() + "/portfolio");
+
         return "portfolio";
     }
 
@@ -75,6 +87,11 @@ public class ViewController {
         model.addAttribute("company", company);
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolioList", portfolioList);
+
+        // SEO
+        model.addAttribute("pageTitle", "완료된 포트폴리오 | " + seoConfig.getSiteName());
+        model.addAttribute("pageDescription", "San Investment 완료된 포트폴리오 목록");
+        model.addAttribute("canonicalUrl", seoConfig.getBaseUrl() + "/history");
 
         return "portfolio_history";
     }
@@ -91,6 +108,14 @@ public class ViewController {
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolio", portfolio);
         model.addAttribute("portfolioNewsList", portfolioNewsList);
+
+        // SEO
+        model.addAttribute("pageTitle", portfolio.getPortfolioTitle() + " | " + seoConfig.getSiteName());
+        model.addAttribute("pageDescription", portfolio.getPortfolioSummary());
+        model.addAttribute("canonicalUrl", seoConfig.getBaseUrl() + "/portfolio/" + portfolioNo);
+        if (portfolio.getPortfolioImgUrl() != null) {
+            model.addAttribute("ogImage", seoConfig.getBaseUrl() + portfolio.getPortfolioImgUrl());
+        }
 
         return "portfolio_detail";
     }

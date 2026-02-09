@@ -43,7 +43,7 @@
                     <a th:each="portfolio : ${portfolioList}" class="investment-card" th:href="${portfolio.portfolioDetailUrl}" th:data-name="${portfolio.portfolioTitle}">
                         <div class="card-date" th:text="${portfolio.portfolioDate}"></div>
                         <h3 class="card-title" th:text="${portfolio.portfolioTitle}"></h3>
-                        <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
+                        <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" th:alt="${portfolio.portfolioTitle}" />
                     </a>
                 </div>
             </article>

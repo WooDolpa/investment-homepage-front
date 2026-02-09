@@ -48,9 +48,10 @@ The application requires the following environment variables to be set:
 
 This application depends on a shared common module:
 - **Dependency**: `san.investment:investment-homepage-common:1.0` (installed in mavenLocal)
-- **Provides**: Shared entities (Company, Menu, Portfolio), enums (DataStatus, PortfolioType), and exceptions
+- **Provides**: Shared entities (Company, Menu, Portfolio, PortfolioMain, PortfolioNews), enums (DataStatus, PortfolioType), exceptions (CustomException, ExceptionCode), and ApiResponseDto
 - **Component Scanning**: Both `san.investment.front` and `san.investment.common` packages
 - **Entity Scanning**: Entities are in `san.investment.common.entity` package
+- **Prerequisite**: `cd ../investment-homepage-common && ./gradlew clean build publishToMavenLocal`
 
 ### Layered Architecture
 
@@ -70,16 +71,17 @@ The application follows a clean layered MVC architecture:
 
 **Repository Layer** (`repository/`)
 - Extends `JpaRepository` from Spring Data JPA
-- Uses method name derivation for queries (e.g., `findByDataStatusOrderByOrderNumAsc`)
-- QueryDSL is configured but currently uses standard JPA queries
-- `JPAQueryFactory` bean is available in `QueryDSLConfig` if complex queries are needed
+- Uses method name derivation for simple queries (e.g., `findByDataStatusOrderByOrderNumAsc`)
+- Custom repositories use QueryDSL with `JPAQueryFactory` for complex queries
+- Custom repository pattern: interface `XxxCustomRepository` + implementation `XxxRepositoryImpl`
+- Return `Optional` for single results, `Optional<List>` for collections
 
 **DTO Layer** (`dto/`)
 - Response DTOs for transferring data to templates
 - All DTOs use Lombok (`@Builder`, `@Getter`, `@NoArgsConstructor`, `@AllArgsConstructor`)
 - Decouples entity structure from view requirements
 
-### Configuration Files
+### Configuration
 
 **Profile-Based Configuration**:
 - Profiles: `local` and `prod`
@@ -93,10 +95,39 @@ The application follows a clean layered MVC architecture:
 - `QueryDSLConfig`: Provides `JPAQueryFactory` bean for type-safe queries
 - `WebMvcConfig`: Maps `/uploads/**` URL pattern to file system for serving uploaded files
 
-### Template Structure
+## View Routes
+
+| URL | Controller Method | Template | `data-page` |
+|-----|------------------|----------|-------------|
+| `/` | `HomeController.home()` | redirect to `/main` | — |
+| `/main` | `ViewController.main()` | `main.html` | (none) |
+| `/portfolio` | `ViewController.portfolio()` | `portfolio.html` | `portfolio` |
+| `/history` | `ViewController.history()` | `portfolio_history.html` | `portfolio-history` |
+| `/portfolio/{portfolioNo}` | `ViewController.portfolioDetail()` | `portfolio_detail.html` | `portfolio-detail` |
+
+## API Endpoints
+
+### Portfolio Search API
+- **Endpoint**: `GET /v1/api/portfolio/list`
+- **Parameters**:
+  - `portfolioType`: "P" (progress) or "C" (completed)
+  - `searchType`: "portfolioTitle"
+  - `keyword`: Search keyword (can be empty for all results)
+- **Response**: JSON wrapped in `ApiResponseDto`
+
+### Portfolio News Search API
+- **Endpoint**: `GET /v1/api/portfolio/news/list`
+- **Parameters**:
+  - `portfolioNo`: Portfolio ID
+  - `searchType`: "newsTitle" or "newsAgency" (empty searches both)
+  - `keyword`: Search keyword
+- **Response**: JSON wrapped in `ApiResponseDto`
+
+**Response Structure Note**: API responses can be either array `[...]` or object with nested array `{data: [...]}` or `{list: [...]}`. Frontend JavaScript handles both formats.
+
+## Template Structure
 
 **Thymeleaf Fragment-Based Design**:
-- Templates located in `src/main/resources/templates/`
 - Reusable fragments in `templates/fragments/`:
   - `common.html`: nav (mobile), logo (header), header (desktop navigation)
   - `header.html`: HTML head section
@@ -107,69 +138,71 @@ The application follows a clean layered MVC architecture:
 
 **Page Identification Pattern**:
 - Each page template uses `data-page` attribute on `<body>` tag
-- JavaScript uses `document.body.dataset.page` to identify current page
-- Examples: `data-page="portfolio"`, `data-page="portfolio-history"`, `data-page="portfolio-detail"`
-
-### Frontend JavaScript Architecture
-
-**Common JavaScript** (`src/main/resources/static/js/common.js`):
-- Single JavaScript file for all page interactions
-- Uses page identification pattern to conditionally execute page-specific code
+- JavaScript uses `document.body.dataset.page` to identify current page and conditionally execute page-specific code
 - Pattern: `if (currentPage === "portfolio") { ... }`
+
+## Frontend Architecture
+
+**Single-file approach**: All JS in `static/js/common.js`, all CSS in `static/css/common.css`.
 
 **Key Frontend Features**:
 1. **Portfolio Search** (portfolio.html, portfolio_history.html)
-   - Client-side search with API integration
    - Triggered by Enter key or search button click
    - Dynamic card rendering via `createCardElement()` and `renderCards()`
-   - API endpoint: `/v1/api/portfolio/list?portfolioType={P|C}&searchType=portfolioTitle&keyword={keyword}`
+   - Determines `portfolioType` ("P" or "C") based on current page
 
-2. **Card Animation System**
+2. **News Search** (portfolio_detail.html)
+   - Filter dropdown: all, newsTitle, newsAgency
+   - Dynamic table rendering via `renderNewsTable()`
+
+3. **Card Animation System**
    - Uses IntersectionObserver for scroll-based reveal animations
    - Cards have `is-reveal-init` class initially, `is-visible` class when in viewport
    - Staggered animation delays via `--reveal-delay` CSS custom property
 
-3. **Navigation**
+4. **Navigation**
    - Mobile hamburger menu toggle
    - Desktop horizontal scrollable navigation with drag support
    - Active state management based on `data-page` attribute
 
-**CSS Architecture** (`src/main/resources/static/css/common.css`):
-- Single stylesheet for all pages
-- Card styling classes:
-  - `.card-date`: Small date text above title (portfolio pages)
-  - `.card-title`: Main title text (portfolio pages)
-  - `.card-title-date`: Date-only display (main page)
-  - All use absolute positioning over card images
-  - Hover effects change text color to `#6a0dad` (purple)
+**Card Styling** (CSS):
+- `.card-date`: Small date text above title (portfolio pages)
+- `.card-title`: Main title text (portfolio pages)
+- `.card-title-date`: Date-only display (main page variation)
+- All use absolute positioning over card images; hover color `#6a0dad` (purple)
 
-### Portfolio Card Rendering Pattern
+## Enums
 
-**Unified Card Structure** (used in main.html, portfolio.html, portfolio_history.html):
-```html
-<a class="investment-card" th:href="${portfolio.portfolioDetailUrl}" th:data-name="${portfolio.portfolioTitle}">
-    <div class="card-date" th:text="${portfolio.portfolioDate}"></div>  <!-- Only on portfolio pages -->
-    <h3 class="card-title" th:text="${portfolio.portfolioTitle}"></h3>
-    <img th:src="${portfolio.portfolioImgUrl ?: '/images/default-portfolio.svg'}" alt="" />
-</a>
-```
+**SearchType** (`enums/SearchType.java`):
+- `PORTFOLIO_TITLE("portfolioTitle")` — portfolio title search
+- `NEWS_TITLE("newsTitle")` — news article title search
+- `NEWS_AGENCY("newsAgency")` — news agency name search
+- Static method: `findSearchType(String key)` returns matching enum or null
 
-**Main Page Variation**:
-- Uses `.card-title-date` class instead of separate date/title elements
-- Displays only date information in the title position
+## Domain Structure
 
-**Dynamic Rendering** (via JavaScript):
-- `createCardElement(portfolio, index)`: Creates card DOM elements from API data
-- `renderCards(portfolios)`: Clears and re-renders entire card area
-- Preserves animation effects during re-render
+**Company**: Company info display (logo, main image, address)
+- `CompanyRepository` → `CompanyService` → `CompanyResDto`
+- Uses fixed ID: `ApiConstants.COMPANY_ID = 1`
 
-### File Upload Handling
+**Menu**: Navigation menu items
+- `MenuRepository` → `MenuService` → `MenuResDto`
 
-- Max file size: 500MB
-- Uploaded files served via `/uploads/**` endpoint
-- Category directories: `company/`, `portfolio/`
-- `FileUtil.convertToWebPath()` converts file system paths to web-accessible URLs
-- Base path configured via `FILE_SAVE_URL` environment variable
+**Portfolio**: Project portfolio display with search
+- `PortfolioRepository` (+ `PortfolioCustomRepository`) → `PortfolioService` → `PortfolioResDto`
+- `PortfolioMainRepository` (+ `PortfolioMainCustomRepository`) → featured portfolios on main page → `PortfolioMainResDto`
+- `PortfolioNewsRepository` (+ `PortfolioNewsCustomRepository`) → news articles per portfolio → `PortfolioNewsResDto`
+
+## Working with QueryDSL
+
+QueryDSL is actively used in custom repository implementations:
+
+1. Q-classes are generated in `src/main/generated/` during compilation
+2. Annotation processors configured in `build.gradle` for Jakarta persistence
+3. `JPAQueryFactory` bean available for injection
+4. Q-classes are automatically cleaned on `./gradlew clean`
+5. Existing implementations: `PortfolioRepositoryImpl`, `PortfolioMainRepositoryImpl`, `PortfolioNewsRepositoryImpl`
+6. Pattern: null-safe `BooleanExpression` predicates for dynamic query building
 
 ## Database Configuration
 
@@ -180,92 +213,17 @@ The application follows a clean layered MVC architecture:
 - **Open-in-view**: `false` - prevents lazy loading in views
 - **SQL Logging**: DEBUG level for Hibernate SQL, TRACE for bind parameters and results
 
-## Working with QueryDSL
+## File Upload Handling
 
-QueryDSL is configured and ready to use:
-
-1. Q-classes are generated in `src/main/generated/` during compilation
-2. Annotation processors configured in `build.gradle` for Jakarta persistence
-3. `JPAQueryFactory` bean available for injection
-4. Q-classes are automatically cleaned on `./gradlew clean`
-
-Example usage pattern:
-```java
-@RequiredArgsConstructor
-public class CustomRepositoryImpl {
-    private final JPAQueryFactory queryFactory;
-
-    // Use QEntity classes for type-safe queries
-}
-```
-
-## API Endpoints
-
-### Portfolio Search API
-- **Endpoint**: `GET /v1/api/portfolio/list`
-- **Parameters**:
-  - `portfolioType`: "P" (progress) or "C" (completed)
-  - `searchType`: "portfolioTitle" (currently only title search supported)
-  - `keyword`: Search keyword (can be empty for all results)
-- **Response**: JSON array of portfolio objects wrapped in `ApiResponseDto`
-- **Response Structure**: Can be either array `[...]` or object with nested array `{data: [...]}` or `{list: [...]}`
-
-## Code Patterns and Conventions
-
-### Service Layer Pattern
-- Use `@Transactional(readOnly = true)` for read-only operations
-- Services return DTOs, not entities
-- Inject repositories via constructor (use Lombok `@RequiredArgsConstructor`)
-
-### Repository Layer Pattern
-- Prefer Spring Data JPA method name derivation for simple queries
-- Use QueryDSL for complex queries requiring type safety
-- Return `Optional` for single results, `Optional<List>` for collections
-
-### Controller Pattern
-- Controllers inject multiple services as needed
-- Populate `Model` with DTOs using descriptive attribute names
-- Return template names as strings (e.g., `"main"`, `"portfolio"`)
-- API controllers return `ResponseEntity` with `ApiResponseDto` wrapper
-
-### Constants Usage
-- API constants defined in `ApiConstants.java`
-- Use constants for fixed IDs (e.g., `ApiConstants.COMPANY_ID`)
-
-### Frontend JavaScript Patterns
-- Always check `currentPage` before executing page-specific code
-- Use `fetch` API for AJAX requests to `/v1/api` endpoints
-- Handle both array and object-wrapped API responses
-- Maintain animation classes during dynamic rendering
-
-## Domain Structure
-
-The application is organized by business domains:
-
-**Company Domain**: Company information display
-- Repository: `CompanyRepository`
-- Service: `CompanyService`
-- DTO: `CompanyResDto`
-- Usage: Header logo, main page company info
-
-**Menu Domain**: Navigation menu management
-- Repository: `MenuRepository`
-- Service: `MenuService`
-- DTO: `MenuResDto`
-- Usage: Site navigation (desktop and mobile)
-
-**Portfolio Domain**: Project portfolio display
-- Repository: `PortfolioRepository`
-- Service: `PortfolioService`
-- DTOs: `PortfolioResDto`, `PortfolioMainResDto`
-- Usage: Portfolio pages with progress/completed projects, search functionality
+- Max file size: 500MB
+- Uploaded files served via `/uploads/**` endpoint
+- Category directories: `company/`, `portfolio/`
+- `FileUtil.convertToWebPath()` converts file system paths to web-accessible URLs
+- Portfolio images use fallback: `/images/default-portfolio.svg` when `portfolioImgUrl` is null
 
 ## Important Notes
 
-- This is a **hybrid application**: server-side rendering for initial page load, with AJAX API calls for dynamic content
-- All entities come from the shared `investment-homepage-common` module
-- Before running, ensure the common module is installed: `cd ../investment-homepage-common && ./gradlew clean build publishToMavenLocal`
+- This is a **hybrid application**: server-side rendering for initial page load, with AJAX API calls for dynamic content (search)
+- All entities come from the shared `investment-homepage-common` module — they are not in this repository
 - Logs are written to `logs/admin.log` (configured in `logback-spring.xml`)
-- The application uses constructor-based dependency injection via Lombok
-- Static resources (CSS, JS) are in `src/main/resources/static/`
-- Portfolio images use fallback: `/images/default-portfolio.svg` when `portfolioImgUrl` is null
+- Constructor-based dependency injection via Lombok `@RequiredArgsConstructor`

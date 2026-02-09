@@ -2,7 +2,29 @@
     <th:block th:fragment="commonHeader">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>San Investment</title>
+
+        <!-- SEO 기본 -->
+        <title th:text="${pageTitle} ?: 'San Investment'">San Investment</title>
+        <meta name="description" th:attr="content=${pageDescription} ?: 'San Investment - 투자 전문 기업'">
+        <meta name="keywords" th:attr="content=${pageKeywords} ?: '투자, investment, 포트폴리오, San Investment'">
+
+        <!-- Canonical URL -->
+        <link rel="canonical" th:href="${canonicalUrl} ?: 'http://saninvestment.kr'">
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="San Investment">
+        <meta property="og:title" th:attr="content=${pageTitle} ?: 'San Investment'">
+        <meta property="og:description" th:attr="content=${pageDescription} ?: 'San Investment - 투자 전문 기업'">
+        <meta property="og:url" th:attr="content=${canonicalUrl} ?: 'http://saninvestment.kr'">
+        <meta property="og:image" th:attr="content=${ogImage} ?: (${company?.logoUrl} ?: '')">
+
+        <!-- 네이버 서치어드바이저 인증 (등록 후 코드 입력) -->
+        <!-- <meta name="naver-site-verification" content="여기에_인증코드_입력"> -->
+
+        <!-- 구글 서치콘솔 인증 (등록 후 코드 입력) -->
+        <!-- <meta name="google-site-verification" content="여기에_인증코드_입력"> -->
+
         <link rel="stylesheet" th:href="@{/css/common.css}">
     </th:block>
 </th:block>
