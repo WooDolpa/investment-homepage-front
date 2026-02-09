@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/header :: commonHeader}"></th:block>
+</head>
+<body>
+    <main>
+        <section class="business-card">
+            <div class="business-card__logo" th:if="${company.logoUrl}">
+                <img th:src="${company.logoUrl}" th:alt="${company.companyName}" />
+            </div>
+            <h1 class="business-card__name" th:text="${company.companyName}"></h1>
+            <div class="business-card__image" th:if="${company.mainImgUrl}">
+                <img th:src="${company.mainImgUrl}" th:alt="${company.companyName}" />
+            </div>
+            <div class="business-card__address" th:if="${company.fullAddress}" th:text="${company.fullAddress}"></div>
+        </section>
+    </main>
+</body>
+</html>

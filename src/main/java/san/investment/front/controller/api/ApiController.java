@@ -49,4 +49,5 @@ public class ApiController {
         return new ResponseEntity<>(ApiResponseDto.makeResponse(portfolioService.findPortfolioNewsList(portfolioNo, searchType, keyword)),
                 HttpStatus.OK);
     }
+
 }
