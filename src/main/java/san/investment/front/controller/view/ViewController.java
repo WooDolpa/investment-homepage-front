@@ -148,8 +148,11 @@ public class ViewController {
     public String businessCard(@RequestParam(name = "id") String id, Model model) {
 
         CompanyResDto company = companyService.findCompanyById(id);
+        List<MenuResDto> menuList = menuService.findMenuList();
 
         model.addAttribute("company", company);
+        model.addAttribute("menuList", menuList);
+
 
         return "business_card";
     }

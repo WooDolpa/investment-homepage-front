@@ -177,6 +177,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Reveal business cards on scroll --- //
+  const businessCards = document.querySelectorAll(".business-card-item");
+
+  if (businessCards.length) {
+    businessCards.forEach((card, index) => {
+      card.classList.add("is-reveal-init");
+      card.style.setProperty("--reveal-delay", `${index * 0.12}s`);
+    });
+
+    if ("IntersectionObserver" in window) {
+      const businessCardObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const card = entry.target;
+            if (entry.isIntersecting) {
+              card.classList.add("is-visible");
+              card.classList.remove("is-reveal-init");
+            } else {
+              card.classList.remove("is-visible");
+              card.classList.add("is-reveal-init");
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+
+      businessCards.forEach((card) => businessCardObserver.observe(card));
+    } else {
+      businessCards.forEach((card) => {
+        card.classList.add("is-visible");
+        card.classList.remove("is-reveal-init");
+      });
+    }
+  }
+
   // --- Reveal footer on scroll --- //
   const footer = document.querySelector(".site-footer");
 

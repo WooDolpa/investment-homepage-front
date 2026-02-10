@@ -227,3 +227,5 @@ QueryDSL is actively used in custom repository implementations:
 - All entities come from the shared `investment-homepage-common` module — they are not in this repository
 - Logs are written to `logs/admin.log` (configured in `logback-spring.xml`)
 - Constructor-based dependency injection via Lombok `@RequiredArgsConstructor`
+
+# 자동 수정대신 제시 방향을 제공하고 내가 요청할때만 수정 진행

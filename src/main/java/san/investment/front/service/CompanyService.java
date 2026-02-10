@@ -116,6 +116,8 @@ public class CompanyService {
                 .companyInfo(findCompany.getCompanyInfo())
                 .logoUrl(fileUtil.convertToWebPath(findCompany.getLogoUrl()))
                 .mainImgUrl(fileUtil.convertToWebPath(findCompany.getMainImgUrl()))
+                .businessCard1(fileUtil.convertToWebPath(findCompany.getBusinessCard1()))
+                .businessCard2(fileUtil.convertToWebPath(findCompany.getBusinessCard2()))
                 .fullAddress(fullAddress)
                 .build();
     }

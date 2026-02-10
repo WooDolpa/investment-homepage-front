@@ -9,9 +9,23 @@
     <main>
         <section class="lower-section">
             <th:block th:replace="~{fragments/common :: commonNav}"></th:block>
+            <article class="page-content">
+                <div class="investment-image-area">
+                    <img th:src="${company.mainImgUrl}" th:alt="${company.companyName} ?: 'San Investment'" style="max-width: 100%; height: auto"/>
+                </div>
+                <div class="investment-editor-area" th:utext="${company.companyInfo}"></div>
+                <div class="business-card-area">
+                    <div class="business-card-item">
+                        <img th:src="${company.businessCard1}" alt="명함 앞면" />
+                    </div>
+                    <div class="business-card-item">
+                        <img th:src="${company.businessCard2}" alt="명함 뒷면" />
+                    </div>
+                </div>
+            </article>
         </section>
+        <th:block th:replace="~{fragments/footer :: commonFooter}"></th:block>
     </main>
-    <th:block th:replace="~{fragments/footer :: commonFooter}"></th:block>
 </body>
 <th:block th:replace="~{fragments/scripts :: commonScripts}"></th:block>
 </html>

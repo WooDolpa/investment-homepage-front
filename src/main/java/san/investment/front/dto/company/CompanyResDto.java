@@ -23,4 +23,6 @@ public class CompanyResDto {
     private String mainImgUrl;
     private String companyInfo;
     private String fullAddress;
+    private String businessCard1;
+    private String businessCard2;
 }
