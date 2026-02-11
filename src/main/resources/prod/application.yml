@@ -44,5 +44,5 @@ server:
 
 app:
   base-url: http://saninvestment.kr
-  site-name: San Investment
-  site-description: San Investment - 투자 전문 기업
+  site-name: San Investment(산인베스트먼트)
+  site-description: San Investment(산인베스트먼트) - 투자 전문 기업
