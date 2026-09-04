@@ -408,43 +408,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // --- Portfolio News Search --- //
+    // --- Portfolio News Search & Pagination --- //
     const portfolioNo = document.body.dataset.portfolioNo;
     const newsSearchFilter = document.getElementById("performance-filter");
     const newsSearchInput = document.getElementById("performance-query");
     const newsSearchButton = document.querySelector(".performance-search__button");
     const newsTableBody = document.querySelector(".performance-table tbody");
+    const paginationContainer = document.getElementById("performance-pagination");
 
-    const searchPortfolioNews = async (searchType, keyword) => {
-      try {
-        const params = new URLSearchParams({
-          portfolioNo: portfolioNo,
-          searchType: searchType || "",
-          keyword: keyword || "",
-        });
-
-        const response = await fetch(`/v1/api/portfolio/news/list?${params}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        let newsList = data;
-        if (!Array.isArray(data)) {
-          newsList = data.data || data.list || [];
-        }
-
-        renderNewsTable(newsList);
-      } catch (error) {
-        console.error("Portfolio news search error:", error);
-      }
+    const newsState = {
+      page: paginationContainer && paginationContainer.dataset.currentPage ? parseInt(paginationContainer.dataset.currentPage, 10) : 1,
+      size: 10,
+      searchType: "",
+      keyword: ""
     };
 
     const renderNewsTable = (newsList) => {
@@ -452,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       newsTableBody.innerHTML = "";
 
-      if (newsList.length === 0) {
+      if (!newsList || newsList.length === 0) {
         const emptyRow = document.createElement("tr");
         emptyRow.innerHTML = `<td colspan="3" style="text-align: center;">검색 결과가 없습니다.</td>`;
         newsTableBody.appendChild(emptyRow);
@@ -472,10 +448,90 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
+    const renderPagination = (pageData) => {
+      if (!paginationContainer) return;
+
+      if (!pageData || pageData.totalElements <= 0 || !pageData.list || pageData.list.length === 0) {
+        paginationContainer.style.display = "none";
+        return;
+      }
+
+      paginationContainer.style.display = "flex";
+      paginationContainer.dataset.currentPage = pageData.page;
+      paginationContainer.dataset.totalPages = pageData.totalPages;
+
+      let pagesHtml = "";
+      for (let i = pageData.startPage; i <= pageData.endPage; i++) {
+        const isActive = i === pageData.page;
+        pagesHtml += `
+          <button type="button" class="pagination-btn pagination-btn--page${isActive ? " is-active" : ""}"
+                  data-target-page="${i}"
+                  aria-label="${i} 페이지"${isActive ? ' aria-current="page"' : ""}>
+            ${i}
+          </button>
+        `;
+      }
+
+      paginationContainer.innerHTML = `
+        <button type="button" class="pagination-btn pagination-btn--prev"
+                ${pageData.isFirst ? "disabled" : ""}
+                data-target-page="${pageData.page - 1}"
+                aria-label="이전 페이지">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="pagination-pages">
+          ${pagesHtml}
+        </div>
+        <button type="button" class="pagination-btn pagination-btn--next"
+                ${pageData.isLast ? "disabled" : ""}
+                data-target-page="${pageData.page + 1}"
+                aria-label="다음 페이지">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      `;
+    };
+
+    const searchPortfolioNews = async (targetPage = 1) => {
+      try {
+        newsState.page = targetPage;
+        const params = new URLSearchParams({
+          portfolioNo: portfolioNo,
+          searchType: newsState.searchType || "",
+          keyword: newsState.keyword || "",
+          page: newsState.page,
+          size: newsState.size
+        });
+
+        const response = await fetch(`/v1/api/portfolio/news/list?${params}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        let pageData = data;
+        if (data && typeof data === "object" && data.data) {
+          pageData = data.data;
+        }
+
+        const newsList = Array.isArray(pageData) ? pageData : (pageData.list || []);
+        renderNewsTable(newsList);
+        renderPagination(pageData);
+      } catch (error) {
+        console.error("Portfolio news search error:", error);
+      }
+    };
+
     const handleNewsSearch = () => {
-      const searchType = newsSearchFilter ? newsSearchFilter.value : "";
-      const keyword = newsSearchInput ? newsSearchInput.value.trim() : "";
-      searchPortfolioNews(searchType, keyword);
+      newsState.searchType = newsSearchFilter ? newsSearchFilter.value : "";
+      newsState.keyword = newsSearchInput ? newsSearchInput.value.trim() : "";
+      searchPortfolioNews(1);
     };
 
     if (newsSearchInput) {
@@ -491,6 +547,22 @@ document.addEventListener("DOMContentLoaded", () => {
       newsSearchButton.addEventListener("click", (e) => {
         e.preventDefault();
         handleNewsSearch();
+      });
+    }
+
+    if (paginationContainer) {
+      paginationContainer.addEventListener("click", (e) => {
+        const btn = e.target.closest(".pagination-btn");
+        if (!btn || btn.disabled) return;
+
+        const targetPage = parseInt(btn.dataset.targetPage, 10);
+        if (!isNaN(targetPage) && targetPage > 0 && targetPage !== newsState.page) {
+          searchPortfolioNews(targetPage);
+          const tableArea = document.querySelector(".performance-table-area");
+          if (tableArea) {
+            tableArea.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }
       });
     }
   }

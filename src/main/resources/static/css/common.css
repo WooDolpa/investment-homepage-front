@@ -645,6 +645,87 @@ main {
   text-decoration: underline;
 }
 
+/* --- Performance Table Pagination --- */
+.performance-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: #fff;
+  color: #333;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f5f5f7;
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #000;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn.is-active {
+  background: linear-gradient(135deg, #161820, #2f3140);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.pagination-btn svg {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .performance-pagination {
+    gap: 4px;
+  }
+
+  .pagination-pages {
+    gap: 4px;
+  }
+
+  .pagination-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    font-size: 0.85rem;
+  }
+}
+
 .portfolio-detail__content > * {
   opacity: 1;
   transform: translateY(0);

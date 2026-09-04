@@ -58,6 +58,9 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <tr th:if="${#lists.isEmpty(portfolioNewsList)}">
+                                <td colspan="3" style="text-align: center;">등록된 뉴스 기사가 없습니다.</td>
+                            </tr>
                             <tr th:each="portfolioNews : ${portfolioNewsList}">
                                 <td>
                                     <a th:href="${portfolioNews.newsLink}" target="_blank" class="performance-table__link" th:text="${portfolioNews.newsTitle}"></a>
@@ -67,6 +70,31 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="performance-pagination" id="performance-pagination" role="navigation" aria-label="뉴스 목록 페이지 이동"
+                         th:if="${portfolioNewsPage != null and portfolioNewsPage.totalElements > 0}"
+                         th:data-current-page="${portfolioNewsPage.page}"
+                         th:data-total-pages="${portfolioNewsPage.totalPages}">
+                        <button type="button" class="pagination-btn pagination-btn--prev"
+                                th:disabled="${portfolioNewsPage.isFirst}"
+                                th:data-target-page="${portfolioNewsPage.page - 1}"
+                                aria-label="이전 페이지">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <div class="pagination-pages">
+                            <button type="button" class="pagination-btn pagination-btn--page"
+                                    th:each="pageNum : ${#numbers.sequence(portfolioNewsPage.startPage, portfolioNewsPage.endPage)}"
+                                    th:classappend="${pageNum == portfolioNewsPage.page} ? ' is-active' : ''"
+                                    th:data-target-page="${pageNum}"
+                                    th:text="${pageNum}">
+                            </button>
+                        </div>
+                        <button type="button" class="pagination-btn pagination-btn--next"
+                                th:disabled="${portfolioNewsPage.isLast}"
+                                th:data-target-page="${portfolioNewsPage.page + 1}"
+                                aria-label="다음 페이지">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
                     </div>
                 </section>
             </article>

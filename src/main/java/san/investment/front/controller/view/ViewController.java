@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import san.investment.front.config.SeoConfig;
+import san.investment.front.dto.common.PageResponseDto;
 import san.investment.front.dto.company.CompanyResDto;
 import san.investment.front.dto.menu.MenuResDto;
 import san.investment.front.dto.portfolio.PortfolioMainResDto;
@@ -103,12 +104,13 @@ public class ViewController {
         CompanyResDto company = companyService.findCompany();
         List<MenuResDto> menuList = menuService.findMenuList();
         PortfolioResDto portfolio = portfolioService.findPortfolio(portfolioNo);
-        List<PortfolioNewsResDto> portfolioNewsList = portfolioService.findPortfolioNewsList(portfolioNo, null, null);
+        PageResponseDto<PortfolioNewsResDto> portfolioNewsPage = portfolioService.findPortfolioNewsPage(portfolioNo, null, null, 1, 10);
 
         model.addAttribute("company", company);
         model.addAttribute("menuList", menuList);
         model.addAttribute("portfolio", portfolio);
-        model.addAttribute("portfolioNewsList", portfolioNewsList);
+        model.addAttribute("portfolioNewsPage", portfolioNewsPage);
+        model.addAttribute("portfolioNewsList", portfolioNewsPage.getList());
 
         // SEO
         model.addAttribute("pageTitle", portfolio.getPortfolioTitle() + " | " + seoConfig.getSiteName());

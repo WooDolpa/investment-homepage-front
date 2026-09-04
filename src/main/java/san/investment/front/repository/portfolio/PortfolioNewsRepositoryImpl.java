@@ -3,6 +3,9 @@ package san.investment.front.repository.portfolio;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import san.investment.common.entity.portfolio.PortfolioNews;
 import san.investment.front.enums.SearchType;
@@ -38,6 +41,34 @@ public class PortfolioNewsRepositoryImpl implements PortfolioNewsCustomRepositor
                 .fetch();
 
         return Optional.ofNullable(list);
+    }
+
+    @Override
+    public Page<PortfolioNews> findPortfolioNewsPage(Integer portfolioNo, SearchType searchType, String keyword, Pageable pageable) {
+
+        List<PortfolioNews> list = factory.select(portfolioNews)
+                .from(portfolioNews)
+                .innerJoin(portfolioNews.portfolio).fetchJoin()
+                .where(
+                        matchPortfolioNo(portfolioNo),
+                        matchSearch(searchType, keyword)
+                )
+                .orderBy(portfolioNews.orderNum.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = factory.select(portfolioNews.count())
+                .from(portfolioNews)
+                .where(
+                        matchPortfolioNo(portfolioNo),
+                        matchSearch(searchType, keyword)
+                )
+                .fetchOne();
+
+        long total = totalCount != null ? totalCount : 0L;
+
+        return new PageImpl<>(list, pageable, total);
     }
 
     private BooleanExpression matchPortfolioNo(Integer portfolioNo) {

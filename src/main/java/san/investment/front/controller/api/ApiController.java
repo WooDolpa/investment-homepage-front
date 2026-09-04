@@ -43,10 +43,12 @@ public class ApiController {
 
     @GetMapping(path = "/portfolio/news/list")
     public ResponseEntity<String> findPortfolioNewsList(@RequestParam(name = "portfolioNo") Integer portfolioNo,
-                                                        @RequestParam(name = "searchType") String searchType,
-                                                        @RequestParam(name = "keyword") String keyword) {
+                                                        @RequestParam(name = "searchType", required = false) String searchType,
+                                                        @RequestParam(name = "keyword", required = false) String keyword,
+                                                        @RequestParam(name = "page", defaultValue = "1") int page,
+                                                        @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        return new ResponseEntity<>(ApiResponseDto.makeResponse(portfolioService.findPortfolioNewsList(portfolioNo, searchType, keyword)),
+        return new ResponseEntity<>(ApiResponseDto.makeResponse(portfolioService.findPortfolioNewsPage(portfolioNo, searchType, keyword, page, size)),
                 HttpStatus.OK);
     }
 

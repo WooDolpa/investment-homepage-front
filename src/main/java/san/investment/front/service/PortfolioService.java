@@ -1,6 +1,8 @@
 package san.investment.front.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import san.investment.common.entity.portfolio.Portfolio;
 import san.investment.common.entity.portfolio.PortfolioMain;
@@ -9,6 +11,7 @@ import san.investment.common.enums.DataStatus;
 import san.investment.common.enums.PortfolioType;
 import san.investment.common.exception.CustomException;
 import san.investment.common.exception.ExceptionCode;
+import san.investment.front.dto.common.PageResponseDto;
 import san.investment.front.dto.portfolio.PortfolioMainResDto;
 import san.investment.front.dto.portfolio.PortfolioNewsResDto;
 import san.investment.front.dto.portfolio.PortfolioResDto;
@@ -183,5 +186,39 @@ public class PortfolioService {
                             .regDatetime(df.format(portfolioNews.getCreatedDate()))
                             .build();
                 }).toList();
+    }
+
+    /**
+     * 포트폴리오 뉴스 기사 페이징 조회
+     *
+     * @param portfolioNo
+     * @param searchTypeStr
+     * @param keyword
+     * @param page
+     * @param size
+     * @return
+     */
+    public PageResponseDto<PortfolioNewsResDto> findPortfolioNewsPage(Integer portfolioNo, String searchTypeStr, String keyword, int page, int size) {
+
+        SearchType searchType = SearchType.findSearchType(searchTypeStr);
+        int pageIndex = Math.max(0, page - 1);
+        int pageSize = size <= 0 ? 10 : size;
+
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<PortfolioNews> newsPage = portfolioNewsRepository.findPortfolioNewsPage(portfolioNo, searchType, keyword, pageRequest);
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<PortfolioNewsResDto> dtoList = newsPage.getContent().stream()
+                .map(portfolioNews -> PortfolioNewsResDto.builder()
+                        .portfolioNewsNo(portfolioNews.getPortfolioNewsNo())
+                        .newsTitle(portfolioNews.getNewsTitle())
+                        .newsAgency(portfolioNews.getNewsAgency())
+                        .newsLink(portfolioNews.getNewsLink())
+                        .regDatetime(df.format(portfolioNews.getCreatedDate()))
+                        .build())
+                .toList();
+
+        return PageResponseDto.of(dtoList, page, pageSize, newsPage.getTotalElements());
     }
 }
