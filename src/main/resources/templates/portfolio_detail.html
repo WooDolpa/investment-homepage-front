@@ -76,7 +76,7 @@
                          th:data-current-page="${portfolioNewsPage.page}"
                          th:data-total-pages="${portfolioNewsPage.totalPages}">
                         <button type="button" class="pagination-btn pagination-btn--prev"
-                                th:disabled="${portfolioNewsPage.isFirst}"
+                                th:if="${!portfolioNewsPage.isFirst}"
                                 th:data-target-page="${portfolioNewsPage.page - 1}"
                                 aria-label="이전 페이지">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -90,7 +90,7 @@
                             </button>
                         </div>
                         <button type="button" class="pagination-btn pagination-btn--next"
-                                th:disabled="${portfolioNewsPage.isLast}"
+                                th:if="${!portfolioNewsPage.isLast}"
                                 th:data-target-page="${portfolioNewsPage.page + 1}"
                                 aria-label="다음 페이지">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>

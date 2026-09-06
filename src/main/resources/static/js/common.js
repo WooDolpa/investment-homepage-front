@@ -472,22 +472,31 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       }
 
-      paginationContainer.innerHTML = `
+      const isFirst = Boolean(pageData.isFirst ?? pageData.first ?? (pageData.page <= 1));
+      const isLast = Boolean(pageData.isLast ?? pageData.last ?? (pageData.page >= pageData.totalPages));
+
+      const prevBtnHtml = isFirst ? "" : `
         <button type="button" class="pagination-btn pagination-btn--prev"
-                ${pageData.isFirst ? "disabled" : ""}
                 data-target-page="${pageData.page - 1}"
                 aria-label="이전 페이지">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="pagination-pages">
-          ${pagesHtml}
-        </div>
+      `;
+
+      const nextBtnHtml = isLast ? "" : `
         <button type="button" class="pagination-btn pagination-btn--next"
-                ${pageData.isLast ? "disabled" : ""}
                 data-target-page="${pageData.page + 1}"
                 aria-label="다음 페이지">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
+      `;
+
+      paginationContainer.innerHTML = `
+        ${prevBtnHtml}
+        <div class="pagination-pages">
+          ${pagesHtml}
+        </div>
+        ${nextBtnHtml}
       `;
     };
 
