@@ -438,11 +438,11 @@ document.addEventListener("DOMContentLoaded", () => {
       newsList.forEach((news) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>
+          <td class="col-title">
             <a href="${news.newsLink || "#"}" class="performance-table__link" target="_blank">${news.newsTitle || ""}</a>
           </td>
-          <td>${news.newsAgency || ""}</td>
-          <td>${news.regDatetime || ""}</td>
+          <td class="col-agency">${news.newsAgency || ""}</td>
+          <td class="col-date">${news.regDatetime || ""}</td>
         `;
         newsTableBody.appendChild(row);
       });

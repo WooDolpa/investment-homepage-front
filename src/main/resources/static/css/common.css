@@ -577,6 +577,24 @@ main {
   width: 100%;
 }
 
+.performance-search__select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.performance-search__select option {
+  background-color: #fff;
+  color: #222;
+  padding: 8px;
+}
+
 .performance-search__button {
   width: 100%;
   padding: 12px 20px;
@@ -632,6 +650,19 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-size: 0.85rem;
+}
+
+.portfolio-detail__table th:nth-child(2),
+.portfolio-detail__table th:nth-child(3),
+.portfolio-detail__table .col-agency,
+.portfolio-detail__table .col-date {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.portfolio-detail__table th:first-child,
+.portfolio-detail__table .col-title {
+  width: auto;
 }
 
 .performance-table__link {
@@ -752,6 +783,15 @@ main {
 }
 
 @media (max-width: 768px) {
+  .investment-image-area {
+    height: auto;
+    max-height: 380px;
+  }
+
+  .portfolio-detail__title {
+    font-size: 1.8rem;
+  }
+
   .portfolio-detail__content {
     gap: 32px;
   }
@@ -766,11 +806,31 @@ main {
   }
 
   .performance-search__controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 85px 1fr auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .performance-search__select,
+  .performance-search__input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    height: 42px;
+  }
+
+  .performance-search__select {
+    padding-right: 26px;
+    background-position: right 8px center;
+    background-size: 12px 12px;
   }
 
   .performance-search__button {
-    padding: 12px 24px;
+    width: auto;
+    height: 42px;
+    padding: 0 16px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    border-radius: 8px;
   }
 
   .portfolio-search__field {
@@ -778,16 +838,110 @@ main {
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* 모바일 뉴스 테이블: 반응형 리스트/카드 뷰 */
+  .portfolio-detail__table,
+  .portfolio-detail__table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .portfolio-detail__table thead {
+    display: none;
+  }
+
+  .portfolio-detail__table tbody tr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "title title"
+      "agency date";
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    row-gap: 8px;
+    column-gap: 6px;
+    align-items: center;
+  }
+
+  .portfolio-detail__table tbody tr td {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .portfolio-detail__table tbody tr td[colspan] {
+    display: block;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 24px 0;
+    color: #888;
+  }
+
+  .portfolio-detail__table .col-title {
+    grid-area: title;
+    width: 100%;
+    font-size: 0.98rem;
+    font-weight: 500;
+    line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  .portfolio-detail__table .col-title .performance-table__link {
+    display: block;
+    color: #111;
+  }
+
+  .portfolio-detail__table .col-agency {
+    grid-area: agency;
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .portfolio-detail__table .col-agency:not(:empty)::after {
+    content: "·";
+    margin-left: 6px;
+    color: #aaa;
+    font-weight: bold;
+  }
+
+  .portfolio-detail__table .col-date {
+    grid-area: date;
+    font-size: 0.85rem;
+    color: #888;
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 600px) {
   .performance-search__controls {
-    grid-template-columns: 1fr;
+    grid-template-columns: 78px 1fr auto;
+    gap: 6px;
+  }
+
+  .performance-search__select,
+  .performance-search__input {
+    height: 38px;
+    font-size: 0.85rem;
+  }
+
+  .performance-search__select {
+    padding: 8px 22px 8px 8px;
+    background-position: right 6px center;
+    background-size: 11px 11px;
+  }
+
+  .performance-search__input {
+    padding: 8px 10px;
   }
 
   .performance-search__button {
-    width: 100%;
-    padding: 12px 28px;
+    width: auto;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-radius: 8px;
   }
 }
 
@@ -852,6 +1006,15 @@ main {
 }
 
 @media (max-width: 480px) {
+  .investment-image-area {
+    max-height: 260px;
+  }
+
+  .portfolio-detail__title {
+    font-size: 1.45rem;
+    line-height: 1.35;
+  }
+
   .investment-card-area {
     grid-template-columns: repeat(1, 1fr); /* Small phones portrait: 1 column */
   }
