@@ -630,6 +630,8 @@ main {
 .performance-table-area {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   padding-top: 12px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .portfolio-detail__table {
@@ -839,10 +841,16 @@ main {
     margin-right: auto;
   }
 
-  /* 모바일 뉴스 테이블: 반응형 리스트/카드 뷰 */
-  .portfolio-detail__table,
-  .portfolio-detail__table tbody {
+  /* 모바일 뉴스 테이블: 독립된 카드/박스(Card & Box) 뷰 */
+  .portfolio-detail__table {
     display: block;
+    width: 100%;
+  }
+
+  .portfolio-detail__table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
   }
 
@@ -852,20 +860,46 @@ main {
 
   .portfolio-detail__table tbody tr {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
       "title title"
       "agency date";
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    row-gap: 8px;
-    column-gap: 6px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    row-gap: 10px;
+    column-gap: 8px;
     align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .portfolio-detail__table tbody tr:active,
+  .portfolio-detail__table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.12);
+    background-color: #fff;
   }
 
   .portfolio-detail__table tbody tr td {
     padding: 0;
     border-bottom: none;
+  }
+
+  .portfolio-detail__table tbody tr:has(td[colspan]) {
+    display: block;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 24px 0;
+  }
+
+  .portfolio-detail__table tbody tr:has(td[colspan]):active,
+  .portfolio-detail__table tbody tr:has(td[colspan]):hover {
+    transform: none;
+    box-shadow: none;
+    background-color: transparent;
   }
 
   .portfolio-detail__table tbody tr td[colspan] {
@@ -880,7 +914,7 @@ main {
     grid-area: title;
     width: 100%;
     font-size: 0.98rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.5;
     word-break: keep-all;
     overflow-wrap: break-word;
@@ -889,27 +923,43 @@ main {
   .portfolio-detail__table .col-title .performance-table__link {
     display: block;
     color: #111;
+    transition: color 0.2s ease;
+  }
+
+  .portfolio-detail__table .col-title .performance-table__link:hover {
+    color: #000;
   }
 
   .portfolio-detail__table .col-agency {
     grid-area: agency;
-    font-size: 0.85rem;
-    color: #666;
+    font-size: 0.8rem;
+    color: #444;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 3px 8px;
+    border-radius: 6px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    width: auto;
+    max-width: fit-content;
+    display: inline-flex;
+    align-items: center;
   }
 
-  .portfolio-detail__table .col-agency:not(:empty)::after {
-    content: "·";
-    margin-left: 6px;
-    color: #aaa;
-    font-weight: bold;
+  .portfolio-detail__table .col-agency:empty {
+    display: none;
   }
 
   .portfolio-detail__table .col-date {
     grid-area: date;
-    font-size: 0.85rem;
+    width: auto;
+    min-width: max-content;
+    font-size: 0.8rem;
     color: #888;
     white-space: nowrap;
+    justify-self: end;
   }
 }
 
@@ -942,6 +992,33 @@ main {
     font-size: 0.85rem;
     white-space: nowrap;
     border-radius: 8px;
+  }
+}
+
+/* 480px 이하: select+input 한 줄, button은 아래 전체 폭 2단 레이아웃으로 전환 (가로 스크롤 방지) */
+@media (max-width: 480px) {
+  .performance-search__controls {
+    grid-template-columns: 78px 1fr;
+    grid-template-areas:
+      "select input"
+      "button button";
+    row-gap: 8px;
+    column-gap: 6px;
+  }
+
+  .performance-search__select {
+    grid-area: select;
+    min-width: 0;
+  }
+
+  .performance-search__input {
+    grid-area: input;
+    min-width: 0;
+  }
+
+  .performance-search__button {
+    grid-area: button;
+    width: 100%;
   }
 }
 
